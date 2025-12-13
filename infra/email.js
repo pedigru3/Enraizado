@@ -7,7 +7,7 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_SMTP_USER,
     pass: process.env.EMAIL_SMTP_PASSWORD,
   },
-  secure: process.env.NODE_ENV === "production" ? true : false,
+  secure: false,
 })
 
 async function send(mailOptions) {
