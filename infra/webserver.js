@@ -7,7 +7,11 @@ function getOrigin() {
     return `https://${process.env.VERCEL_URL}`
   }
 
-  return "https://igrejaconnect.com.br"
+  if (process.env.NODE_ENV === "production") {
+    return `https://${process.env.NEXT_PUBLIC_URL}`
+  }
+
+  return "https://enraizado.vercel.app"
 }
 
 const webserver = {

@@ -5,7 +5,7 @@ import { ValidationError } from "infra/errors.js"
 import webserver from "infra/webserver"
 import { ServiceError } from "infra/errors.js"
 
-const EXPIRATION_IN_MILLISECONDS = 60 * 15 * 1000 // 15 minutos
+const EXPIRATION_IN_MILLISECONDS = 24 * 60 * 60 * 1000 // 24 horas
 
 async function generateToken(userId) {
   const token = crypto.randomBytes(48).toString("hex")
@@ -34,14 +34,15 @@ async function sendEmailToUser(user, activationToken) {
     const activationLink = `${webserver.origin}/cadastro/ativar/${activationToken}`
 
     await email.send({
-      from: "Peregrinos <contato@peregrinos.com.br>",
+      from: "Enraizado <contato@enraizado.com.br>",
       to: user.email,
       subject: "Ative seu cadastro!",
-      text: `${user.username}, clique no link abaixo para ativar o seu cadastro no Simpovidro:
+      text: `${user.username}, clique no link abaixo para ativar o seu cadastro no app Enraizado:
+      
     ${activationLink}
 
     Atenciosamente,
-    Equipe Abravidro`,
+    Equipe Enraizado`,
     })
   } catch (error) {
     throw new ServiceError({
