@@ -128,5 +128,28 @@ describe("POST /api/v1/users", () => {
         status_code: 400,
       })
     })
+    test("With a space in the 'username'", async () => {
+      const response1 = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: "Username com espaço",
+          email: "email1@curso.dev",
+          password: "abc123",
+        }),
+      })
+
+      expect(response1.status).toBe(400)
+
+      const responseBody = await response1.json()
+
+      expect(responseBody).toEqual({
+        name: "ValidationError",
+        message:
+          "Username deve ter entre 3 e 20 caracteres e conter apenas letras, números, underscore (_) e hífen (-)",
+        action: "Ajuste o formato do username",
+        status_code: 400,
+      })
+    })
   })
 })

@@ -97,7 +97,6 @@ describe("PATCH /api/v1/users/[username]", () => {
       })
 
       const responseBody = await response.json()
-      console.log(responseBody)
 
       expect(response.status).toBe(400)
 

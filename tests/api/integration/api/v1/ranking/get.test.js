@@ -144,7 +144,6 @@ describe("GET /api/v1/ranking", () => {
       expect(response.status).toBe(200)
 
       const responseBody = await response.json()
-      console.log(responseBody)
 
       expect(responseBody.users).toHaveLength(2)
       expect(responseBody.pagination).toEqual({

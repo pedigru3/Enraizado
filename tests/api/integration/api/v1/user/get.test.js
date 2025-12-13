@@ -90,7 +90,7 @@ describe("GET /api/v1/user", () => {
       })
 
       const createdUser = await orchestrator.createUser({
-        username: "UserWithHalfValidSession",
+        username: "userValid",
       })
 
       const sessionObject = await orchestrator.createSession(createdUser.id)
@@ -109,7 +109,7 @@ describe("GET /api/v1/user", () => {
 
       expect(responseBody).toEqual({
         id: createdUser.id,
-        username: "UserWithHalfValidSession",
+        username: "userValid",
         email: createdUser.email,
         features: [
           "create:session",

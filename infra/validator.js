@@ -174,7 +174,7 @@ export function validateStringLength(
  */
 export function validateUsername(username) {
   // Username deve ter 3-20 caracteres, apenas letras, números, underscore e hífen
-  const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/
+  const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/
 
   if (!username || !usernameRegex.test(username)) {
     throw new ValidationError({

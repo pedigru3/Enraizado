@@ -1,8 +1,10 @@
 import database from "infra/database"
 import { ValidationError, NotFoundError } from "infra/errors.js"
 import password from "models/password.js"
+import { validateUsername } from "infra/validator.js"
 
 async function create(userInputValues) {
+  validateUsername(userInputValues.username)
   await validateUniqueEmail(userInputValues.email)
   await validateUniqueUsername(userInputValues.username)
   await hashPasswordInObject(userInputValues)
@@ -144,6 +146,7 @@ async function update(username, userInputNewValues) {
       username.toLowerCase() === userInputNewValues.username.toLowerCase()
 
     if (!isUsernameUnchanged) {
+      validateUsername(userInputNewValues.username)
       await validateUniqueUsername(userInputNewValues.username)
     }
   }
