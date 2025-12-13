@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/router"
 import Head from "next/head"
-
+import Image from "next/image"
 const logo = "/icon-circle.png"
 
 const customColors = {
@@ -87,7 +87,7 @@ const ActivationPage = () => {
               className="flex items-center gap-3 cursor-pointer"
               onClick={() => router.push("/")}
             >
-              <img
+              <Image
                 src={logo}
                 alt="Logo Enraizado"
                 className="h-10 w-10 rounded-full shadow-sm hover:rotate-12 transition-transform duration-500"
@@ -145,7 +145,10 @@ const ActivationPage = () => {
                 <div className="flex justify-center">
                   <div
                     className="rounded-full p-4"
-                    style={{ backgroundColor: customColors.brandLight, opacity: 0.2 }}
+                    style={{
+                      backgroundColor: customColors.brandLight,
+                      opacity: 0.2,
+                    }}
                   >
                     <svg
                       className="w-16 h-16"
@@ -245,7 +248,7 @@ const ActivationPage = () => {
       <footer className="bg-gray-900 text-gray-400 py-12 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-3">
-            <img
+            <Image
               src={logo}
               alt="Logo"
               className="h-8 w-8 grayscale opacity-70"
