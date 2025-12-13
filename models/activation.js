@@ -3,6 +3,7 @@ import database from "infra/database.js"
 import crypto from "node:crypto"
 import { ValidationError } from "infra/errors.js"
 import webserver from "infra/webserver"
+import { ServiceError } from "infra/errors.js"
 
 const EXPIRATION_IN_MILLISECONDS = 60 * 15 * 1000 // 15 minutos
 
@@ -29,18 +30,27 @@ async function generateToken(userId) {
 }
 
 async function sendEmailToUser(user, activationToken) {
-  const activationLink = `${webserver.origin}/cadastro/ativar/${activationToken}`
+  try {
+    const activationLink = `${webserver.origin}/cadastro/ativar/${activationToken}`
 
-  await email.send({
-    from: "Peregrinos <contato@peregrinos.com.br>",
-    to: user.email,
-    subject: "Ative seu cadastro!",
-    text: `${user.username}, clique no link abaixo para ativar o seu cadastro no Simpovidro:
+    await email.send({
+      from: "Peregrinos <contato@peregrinos.com.br>",
+      to: user.email,
+      subject: "Ative seu cadastro!",
+      text: `${user.username}, clique no link abaixo para ativar o seu cadastro no Simpovidro:
     ${activationLink}
 
     Atenciosamente,
     Equipe Abravidro`,
-  })
+    })
+  } catch (error) {
+    throw new ServiceError({
+      cause: error,
+      message: "Erro ao enviar email de ativação",
+      action: "Tente novamente mais tarde",
+      statusCode: 503,
+    })
+  }
 }
 
 async function activateAccount(token) {
