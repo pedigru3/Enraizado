@@ -6,7 +6,7 @@ import authorization from "models/authorization.js"
 const router = createRouter()
 
 router.use(controller.injectAnnonymousOrUser)
-router.get(controller.canRequest("read:session"), getHandler)
+router.get(controller.canRequest("read:ranking"), getHandler)
 
 export default router.handler(controller.errorHandlers)
 
@@ -20,7 +20,7 @@ async function getHandler(request, response) {
 
   const secureRanking = authorization.filterOutput(
     request.context.user,
-    "read:session",
+    "read:ranking",
     rankingData,
   )
 

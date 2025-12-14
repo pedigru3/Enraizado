@@ -82,10 +82,25 @@ function filterOutput(user, feature, output) {
     delete clonedOutput.password
     output = clonedOutput
   }
-
   // Para listagens
   if (feature === "read:content" && Array.isArray(output)) {
     return output.map((item) => filterOutput(user, feature, item))
+  }
+
+  // Listagem de ranking
+  if (feature === "read:ranking") {
+    const clonedOutput = { ...output }
+
+    // Remover email de todos os usuários no ranking
+    if (clonedOutput.users && Array.isArray(clonedOutput.users)) {
+      clonedOutput.users = clonedOutput.users.map((user) => {
+        const clonedUser = { ...user }
+        delete clonedUser.email
+        return clonedUser
+      })
+    }
+
+    return clonedOutput
   }
 
   // Para itens individuais

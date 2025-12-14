@@ -98,6 +98,8 @@ describe("GET /api/v1/ranking", () => {
 
       const responseBody = await response.json()
 
+      console.log(responseBody)
+
       expect(responseBody).toEqual({
         users: expect.arrayContaining([
           expect.objectContaining({
@@ -121,6 +123,22 @@ describe("GET /api/v1/ranking", () => {
           hasPrev: false,
         },
       })
+
+      expect(responseBody.users[0]).toEqual({
+        id: expect.any(String),
+        username: "user_200_points",
+        points: 200,
+        forests: [],
+        reading_progress: null,
+        last_insight: null,
+        last_insight_reference: null,
+        last_sync_at: expect.any(String),
+        created_at: expect.any(String),
+        updated_at: expect.any(String),
+      })
+
+      // Verificar que email não está presente
+      expect(responseBody.users[0]).not.toHaveProperty("email")
 
       // Verificar se está ordenado por pontos (maior para menor)
       expect(responseBody.users[0].points).toBeGreaterThanOrEqual(
