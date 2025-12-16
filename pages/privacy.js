@@ -26,6 +26,8 @@ const PrivacyPolicy = () => {
             <div className="flex items-center gap-3">
               <Image
                 src="/icon-circle.png"
+                width={40}
+                height={40}
                 alt="Logo Enraizado"
                 className="h-10 w-10 rounded-full"
               />
