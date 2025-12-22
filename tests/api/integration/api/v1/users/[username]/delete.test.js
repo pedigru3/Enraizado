@@ -94,7 +94,6 @@ describe("DELETE /api/v1/users/[username]", () => {
       expect(response.status).toBe(200)
 
       const responseBody = await response.json()
-      console.log(responseBody)
 
       expect(responseBody).toEqual({
         success: true,

@@ -1,5 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
+import Image from 'next/image';
 import Link from 'next/link';
 import { getBlogPostBySlug, getFeaturedArticles } from '../../lib/strapi';
 import PostContent from '../../components/blog/PostContent';
@@ -74,10 +75,12 @@ export default function BlogPost({ article, relatedArticles }) {
               href="/"
               className="flex items-center gap-3 cursor-pointer"
             >
-              <img
+              <Image
                 src="/icon-circle.png"
                 alt="Logo Enraizado"
-                className="h-10 w-10 rounded-full shadow-sm hover:rotate-12 transition-transform duration-500"
+                width={40}
+                height={40}
+                className="rounded-full shadow-sm hover:rotate-12 transition-transform duration-500"
               />
               <span
                 className="font-bold text-2xl tracking-tight"
@@ -144,10 +147,12 @@ export default function BlogPost({ article, relatedArticles }) {
       <footer className="bg-gray-900 text-gray-400 py-12 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-3">
-            <img
+            <Image
               src="/icon-circle.png"
               alt="Logo"
-              className="h-8 w-8 grayscale opacity-70"
+              width={32}
+              height={32}
+              className="grayscale opacity-70"
             />
             <span className="font-bold text-lg text-gray-200">Enraizado</span>
           </div>
@@ -175,20 +180,12 @@ export default function BlogPost({ article, relatedArticles }) {
 
 // Função para gerar caminhos estáticos
 export async function getStaticPaths() {
-  try {
-    // Por enquanto, vamos gerar caminhos vazios e usar fallback
-    // Em produção, você pode buscar todos os slugs do Strapi
-    return {
-      paths: [],
-      fallback: 'blocking', // Gera páginas sob demanda
-    };
-  } catch (error) {
-    console.error('Erro ao gerar caminhos estáticos:', error);
-    return {
-      paths: [],
-      fallback: 'blocking',
-    };
-  }
+  // Por enquanto, vamos gerar caminhos vazios e usar fallback
+  // Em produção, você pode buscar todos os slugs do Strapi
+  return {
+    paths: [],
+    fallback: 'blocking', // Gera páginas sob demanda
+  };
 }
 
 // Função para buscar dados estáticos

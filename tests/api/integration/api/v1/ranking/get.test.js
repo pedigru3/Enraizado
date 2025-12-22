@@ -98,8 +98,6 @@ describe("GET /api/v1/ranking", () => {
 
       const responseBody = await response.json()
 
-      console.log(responseBody)
-
       expect(responseBody).toEqual({
         users: expect.arrayContaining([
           expect.objectContaining({

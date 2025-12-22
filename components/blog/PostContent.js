@@ -137,7 +137,6 @@ const PostContent = ({ post, relatedPosts = [] }) => {
                 }
                 width={1200}
                 height={675}
-                layout="responsive"
                 className="w-full h-auto rounded-lg shadow-lg"
               />
               {file.caption && (
@@ -241,7 +240,6 @@ const PostContent = ({ post, relatedPosts = [] }) => {
                           }
                           width={800}
                           height={450}
-                          layout="intrinsic"
                           className="max-w-full max-h-[70vh] w-auto h-auto object-contain"
                         />
                       </div>
@@ -420,7 +418,6 @@ const PostContent = ({ post, relatedPosts = [] }) => {
             alt={title}
             width={1200}
             height={384}
-            layout="responsive"
             className="w-full h-64 md:h-96 object-cover sm:rounded-2xl shadow-lg"
           />
         </div>
