@@ -344,6 +344,59 @@ async function hashPasswordInObject(userInputNewValues) {
   userInputNewValues.password = passwordHashed
 }
 
+async function deleteByUsername(username) {
+  const userFound = await findOneByUsername(username)
+
+  // Usar transação para garantir consistência
+  const client = await database.getNewClient()
+
+  try {
+    await client.query("BEGIN")
+
+    // Excluir todas as sessões do usuário
+    await client.query({
+      text: `
+        DELETE FROM
+          sessions
+        WHERE
+          user_id = $1
+      `,
+      values: [userFound.id],
+    })
+
+    // Excluir todos os tokens de ativação do usuário
+    await client.query({
+      text: `
+        DELETE FROM
+          user_activation_tokens
+        WHERE
+          user_id = $1
+      `,
+      values: [userFound.id],
+    })
+
+    // Excluir o usuário
+    await client.query({
+      text: `
+        DELETE FROM
+          users
+        WHERE
+          id = $1
+      `,
+      values: [userFound.id],
+    })
+
+    await client.query("COMMIT")
+
+    return { success: true, message: "Conta excluída com sucesso" }
+  } catch (error) {
+    await client.query("ROLLBACK")
+    throw error
+  } finally {
+    await client.end()
+  }
+}
+
 async function findAllByPoints({ limit = 10, offset = 0 } = {}) {
   // Validar parâmetros de paginação
   const parsedLimit = parseInt(limit, 10)
@@ -422,6 +475,7 @@ const user = {
   update,
   setFeatures,
   updateUserPoints,
+  deleteByUsername,
   findAllByPoints,
 }
 

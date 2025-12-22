@@ -238,6 +238,12 @@ const Home = () => {
               >
                 Benefícios
               </a>
+              <Link
+                href="/blog"
+                className="text-gray-600 hover:text-brand-primary font-medium transition-colors"
+              >
+                Blog
+              </Link>
               <a
                 onClick={() => scrollToSection("baixar")}
                 className="hover:bg-brand-dark text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
@@ -291,6 +297,12 @@ const Home = () => {
             >
               Benefícios
             </a>
+            <Link
+              href="/blog"
+              className="block px-3 py-3 text-gray-600 hover:bg-green-50 hover:text-brand-primary rounded-md font-medium"
+            >
+              Blog
+            </Link>
             <a
               onClick={() => scrollToSection("baixar")}
               className="block mt-4 w-full text-center text-white px-3 py-3 rounded-lg font-bold cursor-pointer"

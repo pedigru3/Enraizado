@@ -19,6 +19,7 @@ A API utiliza autenticação baseada em sessões através de cookies. Todos os e
 3. **Login**: Obter uma sessão válida
 4. **Usar endpoints**: Enviar o cookie da sessão nas requisições
 5. **Logout**: Encerrar a sessão
+6. **Exclusão (opcional)**: Excluir permanentemente a conta e todos os dados relacionados
 
 ### 1. Registro de Usuário
 
@@ -231,6 +232,67 @@ Retorna as informações públicas de um usuário específico.
 ```bash
 curl http://localhost:3000/api/v1/users/outro_usuario \
   -b cookies.txt
+```
+
+### Exclusão de Conta de Usuário
+
+**Endpoint:** `DELETE /users/{username}`
+
+Permite ao usuário excluir permanentemente sua própria conta e todos os dados relacionados (sessões ativas, tokens de ativação, etc.). Esta operação não pode ser desfeita.
+
+**⚠️ Importante:** Apenas o próprio usuário pode excluir sua conta. Tentativas de excluir contas de outros usuários resultarão em erro de permissão.
+
+**Cabeçalhos obrigatórios:**
+
+- Cookie: `session_id=token_da_sessao`
+
+**Exemplo de requisição:**
+
+```bash
+curl -X DELETE http://localhost:3000/api/v1/users/usuario_teste \
+  -b cookies.txt
+```
+
+**Resposta de sucesso (200):**
+
+```json
+{
+  "success": true,
+  "message": "Conta excluída com sucesso"
+}
+```
+
+**Resposta de erro - Tentativa de excluir conta alheia (403):**
+
+```json
+{
+  "name": "ForbiddenError",
+  "message": "Você não possui permissão para executar esta ação.",
+  "action": "Verifique se este usuário possui a feature \"update:user\".",
+  "status_code": 403
+}
+```
+
+**Resposta de erro - Usuário não autenticado (401):**
+
+```json
+{
+  "name": "UnauthorizedError",
+  "message": "Usuário não autenticado.",
+  "action": "Faça novamente o login para continuar.",
+  "status_code": 401
+}
+```
+
+**Resposta de erro - Usuário não encontrado (404):**
+
+```json
+{
+  "name": "NotFoundError",
+  "message": "O username informado não foi encontrado no sistema.",
+  "action": "Verifique se o username está digitado corretamente.",
+  "status_code": 404
+}
 ```
 
 ### Ranking de Usuários
@@ -476,6 +538,10 @@ curl http://localhost:3000/api/v1/ranking \
 # 7. Fazer logout
 curl -X DELETE http://localhost:3000/api/v1/sessions \
   -b cookies.txt
+
+# 8. Excluir conta (opcional - operação irreversível)
+curl -X DELETE http://localhost:3000/api/v1/users/teste_user \
+  -b cookies.txt
 ```
 
 ## Considerações de Segurança
@@ -485,6 +551,7 @@ curl -X DELETE http://localhost:3000/api/v1/sessions \
 - Os tokens de sessão têm expiração automática
 - As requisições são validadas quanto às permissões do usuário
 - Dados sensíveis são filtrados na resposta baseado nas permissões
+- A exclusão de conta é irreversível e remove permanentemente todos os dados do usuário
 
 ## Suporte
 
