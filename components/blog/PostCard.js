@@ -1,5 +1,6 @@
 import React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
@@ -24,9 +25,11 @@ const PostCard = ({ article }) => {
       {/* Imagem de capa */}
       <div className="relative h-48 overflow-hidden">
         <Link href={`/blog/${slug}`}>
-          <img
+          <Image
             src={imageUrl}
             alt={title}
+            width={600}
+            height={192}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         </Link>

@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import Image from "next/image"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import ReactMarkdown from "react-markdown"
@@ -127,13 +128,16 @@ const PostContent = ({ post, relatedPosts = [] }) => {
         ) {
           return (
             <div key={index} className="my-8">
-              <img
+              <Image
                 src={fullUrl}
                 alt={
                   file.alternativeText ||
                   file.data?.attributes?.alternativeText ||
                   ""
                 }
+                width={1200}
+                height={675}
+                layout="responsive"
                 className="w-full h-auto rounded-lg shadow-lg"
               />
               {file.caption && (
@@ -228,13 +232,16 @@ const PostContent = ({ post, relatedPosts = [] }) => {
                             : "absolute inset-0 opacity-0 pointer-events-none"
                         } transition-opacity duration-500 ease-in-out`}
                       >
-                        <img
+                        <Image
                           src={fullFileUrl}
                           alt={
                             file.alternativeText ||
                             file.data?.attributes?.alternativeText ||
                             `Slide ${fileIndex + 1}`
                           }
+                          width={800}
+                          height={450}
+                          layout="intrinsic"
                           className="max-w-full max-h-[70vh] w-auto h-auto object-contain"
                         />
                       </div>
@@ -346,9 +353,11 @@ const PostContent = ({ post, relatedPosts = [] }) => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 text-gray-600 mb-8">
           <div className="flex items-center gap-3">
             {authorAvatar && (
-              <img
+              <Image
                 src={`${process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"}${authorAvatar}`}
                 alt={authorName}
+                width={40}
+                height={40}
                 className="w-10 h-10 rounded-full"
               />
             )}
@@ -406,9 +415,12 @@ const PostContent = ({ post, relatedPosts = [] }) => {
       {/* Imagem de capa */}
       {imageUrl && (
         <div className="mb-8 -mx-4 sm:mx-0">
-          <img
+          <Image
             src={imageUrl}
             alt={title}
+            width={1200}
+            height={384}
+            layout="responsive"
             className="w-full h-64 md:h-96 object-cover sm:rounded-2xl shadow-lg"
           />
         </div>
