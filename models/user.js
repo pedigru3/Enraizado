@@ -467,6 +467,183 @@ async function findAllByPoints({ limit = 10, offset = 0 } = {}) {
   }
 }
 
+async function findAllByPointsWithPeriod({
+  limit = 10,
+  offset = 0,
+  period,
+  year,
+  month,
+} = {}) {
+  // Validar parâmetros de paginação
+  const parsedLimit = parseInt(limit, 10)
+  const parsedOffset = parseInt(offset, 10)
+
+  if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 100) {
+    throw new ValidationError({
+      message: "O limite deve ser um número entre 1 e 100.",
+      action: "Envie um valor válido para o parâmetro 'limit'.",
+    })
+  }
+
+  if (isNaN(parsedOffset) || parsedOffset < 0) {
+    throw new ValidationError({
+      message: "O offset deve ser um número maior ou igual a 0.",
+      action: "Envie um valor válido para o parâmetro 'offset'.",
+    })
+  }
+
+  // Validar parâmetros de período
+  if (period === "year" && (!year || isNaN(parseInt(year)))) {
+    throw new ValidationError({
+      message: "O ano deve ser um número válido quando período é 'year'.",
+      action: "Envie um valor válido para o parâmetro 'year'.",
+    })
+  }
+
+  if (period === "month") {
+    if (!year || isNaN(parseInt(year))) {
+      throw new ValidationError({
+        message: "O ano deve ser um número válido quando período é 'month'.",
+        action: "Envie um valor válido para o parâmetro 'year'.",
+      })
+    }
+    if (!month || isNaN(parseInt(month)) || month < 1 || month > 12) {
+      throw new ValidationError({
+        message:
+          "O mês deve ser um número entre 1 e 12 quando período é 'month'.",
+        action: "Envie um valor válido para o parâmetro 'month'.",
+      })
+    }
+  }
+
+  let whereClause = ""
+  let values = [parsedLimit, parsedOffset]
+  let paramIndex = 3
+
+  // Construir condição WHERE baseada no período
+  if (period === "year") {
+    whereClause = `
+      AND EXTRACT(YEAR FROM (plant_record->>'createdAt')::timestamptz) = $${paramIndex}
+    `
+    values.push(parseInt(year))
+    paramIndex++
+  } else if (period === "month") {
+    whereClause = `
+      AND EXTRACT(YEAR FROM (plant_record->>'createdAt')::timestamptz) = $${paramIndex}
+      AND EXTRACT(MONTH FROM (plant_record->>'createdAt')::timestamptz) = $${paramIndex + 1}
+    `
+    values.push(parseInt(year), parseInt(month))
+    paramIndex += 2
+  }
+
+  // Query para calcular pontos por período e ordenar
+  const results = await database.query({
+    text: `
+      WITH user_period_points AS (
+        SELECT
+          u.id,
+          u.username,
+          u.email,
+          u.forests,
+          u.reading_progress,
+          u.last_insight,
+          u.last_insight_reference,
+          u.last_sync_at,
+          u.created_at,
+          u.updated_at,
+          COALESCE(SUM(
+            CASE
+              WHEN plant_record ? 'createdAt' ${whereClause}
+              THEN 15
+              ELSE 0
+            END
+          ), 0)::INTEGER as period_points
+        FROM users u
+        CROSS JOIN jsonb_array_elements(u.forests) as forest_record
+        CROSS JOIN jsonb_array_elements(
+          jsonb_extract_path(forest_record, 'plants')
+        ) as plant_record
+        GROUP BY u.id, u.username, u.email, u.forests, u.reading_progress,
+                 u.last_insight, u.last_insight_reference, u.last_sync_at,
+                 u.created_at, u.updated_at
+      )
+      SELECT
+        id,
+        username,
+        email,
+        period_points as points,
+        forests,
+        reading_progress,
+        last_insight,
+        last_insight_reference,
+        last_sync_at,
+        created_at,
+        updated_at
+      FROM user_period_points
+      WHERE period_points > 0
+      ORDER BY period_points DESC, created_at ASC
+      LIMIT $1
+      OFFSET $2
+    ;`,
+    values,
+  })
+
+  // Contar total de usuários com pontos no período
+  const countQuery = `
+    WITH user_period_points AS (
+      SELECT
+        u.id,
+        COALESCE(SUM(
+          CASE
+            WHEN plant_record ? 'createdAt' ${whereClause.replace(
+              /\$\d+/g,
+              (match) => {
+                const paramNum = parseInt(match.slice(1))
+                return "$" + (paramNum - 2) // Ajustar índices para a query de contagem
+              },
+            )}
+            THEN 15
+            ELSE 0
+          END
+        ), 0)::INTEGER as period_points
+      FROM users u
+      CROSS JOIN jsonb_array_elements(u.forests) as forest_record
+      CROSS JOIN jsonb_array_elements(
+        jsonb_extract_path(forest_record, 'plants')
+      ) as plant_record
+      GROUP BY u.id
+    )
+    SELECT COUNT(*) as total
+    FROM user_period_points
+    WHERE period_points > 0
+  `
+
+  // Ajustar valores para query de contagem (remover limit e offset)
+  const countValues = values.slice(2)
+  const countResults = await database.query({
+    text: countQuery,
+    values: countValues,
+  })
+
+  const totalUsers = parseInt(countResults.rows[0].total, 10)
+
+  return {
+    users: results.rows,
+    pagination: {
+      limit: parsedLimit,
+      offset: parsedOffset,
+      total: totalUsers,
+      hasNext: parsedOffset + parsedLimit < totalUsers,
+      hasPrev: parsedOffset > 0,
+    },
+    filters: {
+      period,
+      year: year ? parseInt(year) : null,
+      month: month ? parseInt(month) : null,
+    },
+  }
+}
+
 const user = {
   create,
   findOneById,
@@ -477,6 +654,7 @@ const user = {
   updateUserPoints,
   deleteByUsername,
   findAllByPoints,
+  findAllByPointsWithPeriod,
 }
 
 export default user

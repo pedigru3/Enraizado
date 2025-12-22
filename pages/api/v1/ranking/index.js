@@ -11,12 +11,23 @@ router.get(controller.canRequest("read:ranking"), getHandler)
 export default router.handler(controller.errorHandlers)
 
 async function getHandler(request, response) {
-  const { limit = 10, offset = 0 } = request.query
+  const { limit = 10, offset = 0, period, year, month } = request.query
 
-  const rankingData = await user.findAllByPoints({
-    limit: limit,
-    offset: offset,
-  })
+  // Se não há parâmetros de período, usar ranking geral
+  const usePeriodFilter = period && (period === 'year' || period === 'month')
+
+  const rankingData = usePeriodFilter
+    ? await user.findAllByPointsWithPeriod({
+        limit: limit,
+        offset: offset,
+        period,
+        year,
+        month,
+      })
+    : await user.findAllByPoints({
+        limit: limit,
+        offset: offset,
+      })
 
   const secureRanking = authorization.filterOutput(
     request.context.user,

@@ -299,25 +299,37 @@ curl -X DELETE http://localhost:3000/api/v1/users/usuario_teste \
 
 **Endpoint:** `GET /ranking`
 
-Retorna o ranking de usuários ordenado por pontos.
+Retorna o ranking de usuários ordenado por pontos, com opção de filtro por período.
 
 **Parâmetros de query (opcionais):**
 
 - `limit`: Número máximo de resultados (1-100, padrão: 10)
 - `offset`: Número de resultados para pular (≥ 0, padrão: 0)
+- `period`: Filtro de período (`year` ou `month`)
+- `year`: Ano para filtro (obrigatório quando `period=year` ou `period=month`)
+- `month`: Mês para filtro (1-12, obrigatório quando `period=month`)
 
 **Cabeçalhos obrigatórios:**
 
 - Cookie: `session_id=token_da_sessao`
 
-**Exemplo de requisição:**
+**Exemplos de requisição:**
 
 ```bash
+# Ranking geral
 curl "http://localhost:3000/api/v1/ranking?limit=5&offset=0" \
+  -b cookies.txt
+
+# Ranking do ano 2025
+curl "http://localhost:3000/api/v1/ranking?period=year&year=2025" \
+  -b cookies.txt
+
+# Ranking de janeiro de 2025
+curl "http://localhost:3000/api/v1/ranking?period=month&year=2025&month=1" \
   -b cookies.txt
 ```
 
-**Resposta de sucesso (200):**
+**Resposta de sucesso (200) - Ranking Geral:**
 
 ```json
 {
@@ -338,11 +350,39 @@ curl "http://localhost:3000/api/v1/ranking?limit=5&offset=0" \
     }
   ],
   "pagination": {
-    "limit": 5,
+    "limit": 10,
     "offset": 0,
     "total": 25,
     "hasNext": true,
     "hasPrev": false
+  }
+}
+```
+
+**Resposta de sucesso (200) - Ranking com Filtros de Período:**
+
+```json
+{
+  "users": [
+    {
+      "username": "usuario1",
+      "points": 45,
+      "forests": ["floresta1"],
+      "last_insight": "Último insight",
+      "last_insight_reference": "Referência"
+    }
+  ],
+  "pagination": {
+    "limit": 10,
+    "offset": 0,
+    "total": 5,
+    "hasNext": false,
+    "hasPrev": false
+  },
+  "filters": {
+    "period": "month",
+    "year": 2025,
+    "month": 1
   }
 }
 ```
